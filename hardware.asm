@@ -41,6 +41,7 @@
 	EXTERN	TELL
 	EXTERN	PBCDL
 	EXTERN	OUTCHR
+	EXTERN	GETKEY
 	EXTERN	EXPRI
 	EXTERN	COMMA
 	EXTERN	XEQ
@@ -87,9 +88,65 @@ PUTCSR:	LD	(TEXTX),DE		;SAVE X & Y FOR LATER
 ;	  Outputs:  DE = X coordinate (POS)
 ;		    HL = Y coordinate (VPOS)
 ;  	  Destroys: A,D,E,H,L,F
-GETCSR:	LD	DE,(TEXTX)
-	LD	HL,(TEXTY)
+GETCSR:	PUSH	BC
+	PUSH IX
+	PUSH IY
+	LD	IX,RETBUF
+	CALL	TELL
+	DEFB	ESC,"[6n"	; report cursor
+	DEFB	0
+NEXTC:	LD	HL,0
+	CALL	GETKEY
+	JP	NC,NEXTC
+	LD	(IX),A
+	INC IX
+	CP	'R'
+	JP	NZ,NEXTC
+	LD	(IX),0
+	LD	A,00h
+	LD	(TEXTX),A
+	LD	(TEXTY),A
+	LD	IX,RETBUF+2
+	LD	IY,TEXTY
+	CALL	RDNUM
+	LD	A,(IX)
+	CP	';'
+	JP	NZ,GETEXT
+	INC	IX
+	LD	IY,TEXTX
+	CALL	RDNUM
+GETEXT:	LD	DE,00H
+	LD	A,(TEXTX)
+	LD	E,A
+	DEC	DE
+	LD	HL,00H
+	LD	A,(TEXTY)
+	LD	L,A
+	DEC HL
+	POP IY
+	POP IX
+	POP	BC
 	RET
+RDNUM:	LD	(IY),00h
+NXT:	LD	A,(IX)
+	SUB	A,'0'
+	RET	M
+	LD	H,A
+	SUB A,10
+	RET P
+	LD	A,(IY)
+	SLA	A
+	SLA	A
+	SLA	A
+	ADD	A,(IY)
+	ADD	A,(IY)
+	ADD	A,H
+	LD	(IY),A
+	INC	IX
+	JP	NXT
+RETBUF:	DEFB	"E[123;456R"
+		DEFB	00h
+
 
 ;GETIME	- Read elapsed-time clock.
 ;  	  Outputs: DEHL = elapsed time (centiseconds)
