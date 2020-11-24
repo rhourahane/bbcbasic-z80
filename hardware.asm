@@ -73,7 +73,7 @@ PUTCSR:	LD	(TEXTX),DE		;SAVE X & Y FOR LATER
 	LD	A,'['
 	CALL	OUTCHR
 	LD	HL,(TEXTY)
-	INC HL
+	INC	HL
 	CALL	PBCDL
 	LD	A,';'
 	CALL	OUTCHR
@@ -89,8 +89,8 @@ PUTCSR:	LD	(TEXTX),DE		;SAVE X & Y FOR LATER
 ;		    HL = Y coordinate (VPOS)
 ;  	  Destroys: A,D,E,H,L,F
 GETCSR:	PUSH	BC
-	PUSH IX
-	PUSH IY
+	PUSH	IX
+	PUSH	IY
 	LD	IX,RETBUF
 	CALL	TELL
 	DEFB	ESC,"[6n"	; report cursor
@@ -99,7 +99,7 @@ NEXTC:	LD	HL,0
 	CALL	GETKEY
 	JP	NC,NEXTC
 	LD	(IX),A
-	INC IX
+	INC	IX
 	CP	'R'
 	JP	NZ,NEXTC
 	LD	(IX),0
@@ -122,9 +122,9 @@ GETEXT:	LD	DE,00H
 	LD	HL,00H
 	LD	A,(TEXTY)
 	LD	L,A
-	DEC HL
-	POP IY
-	POP IX
+	DEC	HL
+	POP	IY
+	POP	IX
 	POP	BC
 	RET
 RDNUM:	LD	(IY),00h
@@ -132,8 +132,8 @@ NXT:	LD	A,(IX)
 	SUB	A,'0'
 	RET	M
 	LD	H,A
-	SUB A,10
-	RET P
+	SUB	A,10
+	RET	P
 	LD	A,(IY)
 	SLA	A
 	SLA	A
@@ -145,7 +145,7 @@ NXT:	LD	A,(IX)
 	INC	IX
 	JP	NXT
 RETBUF:	DEFB	"E[123;456R"
-		DEFB	00h
+	DEFB	00h
 
 
 ;GETIME	- Read elapsed-time clock.
